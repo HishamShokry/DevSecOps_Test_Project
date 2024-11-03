@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: django
+  template:
+    metadata:
+      labels:
+        app: django
+    spec:
+      containers:
+        - name: django
+          image: django-app:latest  
+          ports:
+            - containerPort: 8000
+          env:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector:4317"  # Endpoint for sending traces to the collector
+            - name: OTEL_SERVICE_NAME
+              value: "django-app"  # Name for tracing service in Jaeger
+          readinessProbe:  # Optional: Adjust according to your app
+            httpGet:
+              path: /health/  # Assuming you have a health check endpoint
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:  # Optional: Adjust according to your app
+            httpGet:
+              path: /health/
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-service
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+  selector:
+    app: django
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-collector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: otel-collector
+  template:
+    metadata:
+      labels:
+        app: otel-collector
+    spec:
+      containers:
+        - name: otel-collector
+          image: otel/opentelemetry-collector:latest
+          ports:
+            - name: grpc  # Named port for gRPC
+              containerPort: 4317  # gRPC port for OTLP
+            - name: http  # Named port for HTTP
+              containerPort: 4318  # HTTP port for OTLP
+          volumeMounts:
+            - name: otel-collector-config
+              mountPath: /etc/otel-collector-config
+              subPath: otel-collector-config.yaml
+      volumes:
+        - name: otel-collector-config
+          configMap:
+            name: otel-collector-config  # Ensure you have a ConfigMap defined for this
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-collector
+spec:
+  ports:
+    - name: grpc  # Named port for gRPC
+      protocol: TCP
+      port: 4317
+      targetPort: 4317
+    - name: http  # Named port for HTTP
+      protocol: TCP
+      port: 4318
+      targetPort: 4318
+  selector:
+    app: otel-collector
