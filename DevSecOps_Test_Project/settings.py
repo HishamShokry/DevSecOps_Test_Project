@@ -46,9 +46,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'opentelemetry.instrumentation.django',
     'users',
+    "django_prometheus",
 ]
 
 MIDDLEWARE = [
+    "django_prometheus.middleware.PrometheusBeforeMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -56,6 +58,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django_prometheus.middleware.PrometheusAfterMiddleware",
+
 ]
 
 ROOT_URLCONF = 'DevSecOps_Test_Project.urls'
@@ -137,24 +141,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
-from opentelemetry import trace
-from opentelemetry.instrumentation.django import DjangoInstrumentor
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+import environ
 
-# Initialize Django Instrumentation
-DjangoInstrumentor().instrument()
+# Initialize the environment variables
+env = environ.Env()
+environ.Env.read_env()  # Reads from the .env file
 
-# Set up OpenTelemetry Tracer
-trace.set_tracer_provider(TracerProvider())
-tracer = trace.get_tracer(__name__)
+# Set whether Prometheus should export migration metrics
+PROMETHEUS_EXPORT_MIGRATIONS = env.bool("PROMETHEUS_EXPORT_MIGRATIONS", True)
 
-# Configure OTLP Exporter to send traces to the OpenTelemetry Collector in Minikube
-otlp_exporter = OTLPSpanExporter(endpoint="otel-collector:4317", insecure=True)
-# span_processor = BatchSpanProcessor(otlp_exporter)
-# trace.get_tracer_provider().add_span_processor(span_processor)
 
-# Set up a trace provider
-trace.set_tracer_provider(TracerProvider())
-trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(otlp_exporter))
+
+
