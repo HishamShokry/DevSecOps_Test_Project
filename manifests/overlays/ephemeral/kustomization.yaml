@@ -1,0 +1,13 @@
+namespace: ephemeral-${branch-name}
+
+resources:
+  - ../../base/
+
+patches:
+  - target:
+      kind: Deployment
+      name: django-app
+    patch: |
+      - op: add
+        path: /metadata/labels/environment
+        value: ephemeral
