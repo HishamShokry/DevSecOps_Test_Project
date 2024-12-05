@@ -1,0 +1,14 @@
+appName: django
+replicaCount: 1
+
+image:
+  repository: django-app
+  tag: latest
+  pullPolicy: Never
+
+containerPort: 8000
+
+service:
+  type: NodePort
+  port: 80
+  nodePort: 30001
