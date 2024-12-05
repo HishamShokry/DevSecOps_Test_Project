@@ -16,3 +16,14 @@ service:
 serviceAccount:
   create: true
   name: ""
+
+
+
+ingress:
+enabled: false
+annotations: {}
+hosts:
+  - host: django-app.local
+    path: /
+    pathType: ImplementationSpecific
+tls: []
