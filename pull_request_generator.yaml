@@ -4,8 +4,10 @@ metadata:
   name: preview-environment-set
   namespace: argocd
 spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
   generators:
-  - pullRequests:
+  - pullRequest:
     github:
       owner: HishamShokry
       repo: DevSecOps_Test_Project
