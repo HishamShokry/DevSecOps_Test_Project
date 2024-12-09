@@ -13,17 +13,17 @@ service:
   port: 80
   nodePort: 30001
 
-serviceAccount:
-  create: true
-  name: ""
+# serviceAccount:
+#   create: true
+#   name: ""
 
 
 
-ingress:
-enabled: false
-annotations: {}
-hosts:
-  - host: django-app.local
-    path: /
-    pathType: ImplementationSpecific
-tls: []
+# ingress:
+# enabled: false
+# annotations: {}
+# hosts:
+#   - host: django-app.local
+#     path: /
+#     pathType: ImplementationSpecific
+# tls: []
