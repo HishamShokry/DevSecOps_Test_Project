@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: preview-environment-set
+  namespace: argocd
+spec:
+  generators:
+  - pullRequests:
+    github:
+      owner: HishamShokry
+      repo: DevSecOps_Test_Project
+      requeueAfterSeconds: 60
+  template:
+    metadata:
+      name: '{{branch}}-preview'
+      namespace: argocd
+    spec:
+      project: default
+      source:
+        repoURL: 'https://github.com/HishamShokry/DevSecOps_Test_Project'
+        targetRevision: '{{head_sha}}'
+        path: 'charts/django-app'
+      destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: '{{branch}}'
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
