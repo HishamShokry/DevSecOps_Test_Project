@@ -11,7 +11,7 @@ spec:
     github:
       owner: HishamShokry
       repo: DevSecOps_Test_Project
-      requeueAfterSeconds: 60
+    requeueAfterSeconds: 60
   template:
     metadata:
       name: '{{branch}}-preview'
