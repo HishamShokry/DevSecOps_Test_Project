@@ -14,17 +14,17 @@ spec:
     requeueAfterSeconds: 60
   template:
     metadata:
-      name: '{{branch}}-preview'
+      name: '{{.branch}}'
       namespace: argocd
     spec:
       project: default
       source:
         repoURL: 'https://github.com/HishamShokry/DevSecOps_Test_Project'
-        targetRevision: '{{head_sha}}'
+        targetRevision: '{{.head_sha}}'
         path: 'charts/django-app'
       destination:
         server: 'https://kubernetes.default.svc'
-        namespace: '{{branch}}'
+        namespace: '{{.branch}}'
       syncPolicy:
         syncOptions:
           - CreateNamespace=true
