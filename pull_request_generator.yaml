@@ -8,23 +8,23 @@ spec:
   goTemplateOptions: ["missingkey=error"]
   generators:
   - pullRequest:
-    github:
-      owner: HishamShokry
-      repo: DevSecOps_Test_Project
-    requeueAfterSeconds: 60
+      github:
+        owner: HishamShokry
+        repo: DevSecOps_Test_Project
   template:
     metadata:
-      name: '{{branch}}-preview'
-      namespace: argocd
+      name: '{{.branch}}'  # Application name based on the branch
+      namespace: 'argocd'
     spec:
       project: default
       source:
         repoURL: 'https://github.com/HishamShokry/DevSecOps_Test_Project'
-        targetRevision: '{{head_sha}}'
-        path: 'charts/django-app'
+        targetRevision: '{{.head_sha}}'  # Use the PR head commit SHA
+        path: 'django-app'  # Correct path to your repository's django-app directory
       destination:
         server: 'https://kubernetes.default.svc'
-        namespace: '{{branch}}'
+        namespace: '{{.branch}}'  # Namespace based on the branch
       syncPolicy:
         syncOptions:
           - CreateNamespace=true
+
