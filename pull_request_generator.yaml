@@ -8,23 +8,23 @@ spec:
   goTemplateOptions: ["missingkey=error"]
   generators:
   - pullRequest:
-    github:
-      owner: HishamShokry
-      repo: DevSecOps_Test_Project
-    requeueAfterSeconds: 60
+      github:
+        owner: HishamShokry
+        repo: DevSecOps_Test_Project
   template:
     metadata:
-      name: '{{.branch}}'
-      namespace: argocd
+      name: '{{.branch}}'  # Unique application name based on the branch
+      namespace: 'argocd'  # Namespace for the ApplicationSet
     spec:
-      project: default
+      project: default  # Reference to the ArgoCD project
       source:
-        repoURL: 'https://github.com/HishamShokry/DevSecOps_Test_Project'
-        targetRevision: '{{.head_sha}}'
-        path: 'charts/django-app'
+        repoURL: 'https://github.com/HishamShokry/DevSecOps_Test_Project'  # Public GitHub repo URL
+        targetRevision: '{{.head_sha}}'  # Use the SHA of the PR head commit
+        path: 'charts/django-app'  # Path to the Helm chart or Kubernetes manifests
       destination:
-        server: 'https://kubernetes.default.svc'
-        namespace: '{{.branch}}'
+        server: 'https://kubernetes.default.svc'  # Default Kubernetes cluster server
+        namespace: '{{.branch}}'  # Namespace based on the branch name, to isolate each PR
       syncPolicy:
         syncOptions:
-          - CreateNamespace=true
+          - CreateNamespace=true  # Automatically create the namespace for the PR
+
